@@ -1,11 +1,13 @@
 import cv2
-from augmentations import rotate, shear, adaptive_thresh, texturize
+from augmentations import rotate, shear, adaptive_thresh, texturize, gaussian_noise
 
 import argparse
 import sys
 import os.path
+import os
 import glob
 import random
+import re
 
 # augmentation test script
 
@@ -17,7 +19,8 @@ if __name__ == "__main__":
 
     args.symbol_folder = os.path.abspath(args.symbol_folder)
 
-    imglist = glob.glob(args.symbol_folder + "/*.JPG")
+    imglist = os.listdir(args.symbol_folder)
+    imglist = [os.path.join(args.symbol_folder, img) for img in imglist if re.search(r'.*\.(jpg|png)', img, re.IGNORECASE)]
     cv2.namedWindow("test")
     texture = cv2.imread("textures/bg_addon/crumpled3.png", cv2.IMREAD_UNCHANGED)
 
@@ -27,5 +30,7 @@ if __name__ == "__main__":
         img[mask != 0] = 255  # masked image
         img = rotate(img, random.randint(0, 180))
         img = shear(img, random.randint(-20, 20))
-        cv2.imshow("test", texturize(img, texture))
+        img = texturize(img, texture)
+        cv2.imshow("test",img)
+        cv2.imshow("test", gaussian_noise(img))
         cv2.waitKey(0)

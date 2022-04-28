@@ -50,7 +50,6 @@ def adaptive_thresh(img):
 def texturize(img, texture):
     h, w, _ = img.shape
     th, tw, _ = texture.shape
-    print(h, w, th, tw)
     chosen_h, chosen_w = random.randint(0, th-h-1), random.randint(0, tw-w-1)
     tex_crop = texture[chosen_h:chosen_h+h, chosen_w:chosen_w+w, 3]
     # TODO: change this 0.7 to something more reasonable
@@ -65,7 +64,17 @@ def texturize(img, texture):
 def color_shift(img):
     pass
 
-def gaussian_noise(img)
+def gaussian_noise(img, var=0.002):
+    if len(img.shape) == 2:
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGR)
+    imsize = img.shape
+    # variance 0.01 is bordering on way too noisy, probably want to keep it at 0.005 at most
+    # 0.001 is a good "realistic" photo noise
+    mean, sigma = 0, var**0.5
+    gauss = np.random.normal(mean, sigma, imsize)
+    gauss = gauss.reshape(*imsize)
+    img = np.clip(img + (255 * gauss), 0, 255).astype(np.uint8)
+    return img
 
 
 # for testing
