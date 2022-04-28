@@ -34,6 +34,15 @@ def rotate(img, degs):
     img = cv2.warpAffine(img, rot_matrix, (nw, nh))
     return img
 
+def adaptive_thresh(img):
+    # returns a black-and-white image
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    alpha = img.copy()
+    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
+    img[:,:,3] = alpha
+    return img
+
 def texturize(img):
     pass
 
