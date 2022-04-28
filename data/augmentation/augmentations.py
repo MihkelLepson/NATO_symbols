@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+import random
 
 
 def shear(img, degs):
@@ -9,13 +10,13 @@ def shear(img, degs):
     shear_matrix = np.array([[1., rads, 0],
                             [0,  1.,   0],
                             [0,  0,    1.]])
-    w, h, _ = img.shape
+    h, w, _ = img.shape
     nw = w + rads*h
 
     if negative:
         img = cv2.flip(img, 0)
 
-    img = cv2.warpPerspective(img, shear_matrix, (int(nw), h))
+    img = cv2.warpPerspective(img, shear_matrix, (int(nw), h), borderValue=(255, 255, 255))
 
     if negative:
         img = cv2.flip(img, 0)
@@ -24,30 +25,47 @@ def shear(img, degs):
 
 def rotate(img, degs):
     h, w, _ = img.shape
-    rot_matrix = cv2.getRotationMatrix2D(center=(w/2, h/2), angle=degs, scale=1.)
+    rot_matrix = cv2.getRotationMatrix2D(center=(w//2, h//2), angle=degs, scale=1.)
     cos, sin = abs(rot_matrix[0, 0]), abs(rot_matrix[0, 1])
     nw = int(h*sin + w*cos)
     nh = int(h*cos + w*sin)
     rot_matrix[0, 2] += (nw//2) - w//2
     rot_matrix[1, 2] += (nh//2) - h//2
 
-    img = cv2.warpAffine(img, rot_matrix, (nw, nh))
+    img = cv2.warpAffine(img,
+                         rot_matrix,
+                         (nw, nh),
+                         borderMode=cv2.BORDER_CONSTANT,
+                         borderValue=(255, 255, 255))
     return img
+
 
 def adaptive_thresh(img):
-    # returns a black-and-white image
+    # returns a black-and-white 1 channel
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, img = cv2.threshold(img, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
-    alpha = img.copy()
-    img = cv2.cvtColor(img, cv2.COLOR_GRAY2BGRA)
-    img[:,:,3] = alpha
     return img
 
-def texturize(img):
-    pass
+
+def texturize(img, texture):
+    h, w, _ = img.shape
+    th, tw, _ = texture.shape
+    print(h, w, th, tw)
+    chosen_h, chosen_w = random.randint(0, th-h-1), random.randint(0, tw-w-1)
+    tex_crop = texture[chosen_h:chosen_h+h, chosen_w:chosen_w+w, 3]
+    # TODO: change this 0.7 to something more reasonable
+    return np.clip(cv2.addWeighted(tex_crop,
+                                   1.0,
+                                   cv2.cvtColor(img, cv2.COLOR_BGR2GRAY),
+                                   0.7,
+                                   10),
+                   0, 255)
+
 
 def color_shift(img):
     pass
+
+def gaussian_noise(img)
 
 
 # for testing
