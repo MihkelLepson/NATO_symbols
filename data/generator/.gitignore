@@ -1,3 +1,5 @@
 data/
 generated_data.npy
 generated_data_labels.npy
+generated_data2.npy
+generated_data_labels2.npy

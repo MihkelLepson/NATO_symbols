@@ -18,7 +18,7 @@ from scipy import ndimage
 #add_noise = True means that random pixels on image are changed to black.
 #noise_threshold is value for which the uniform distribution value for pixel must be higher in order it to change black.
 
-def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, apply_transformation = False, transformation_dir = None, apply_thickness = False, thickness_dir = None, add_noise = False, noise_threshold = 0.999):
+def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, apply_transformation = False, transformation_dir = None, apply_thickness = False, thickness_dir = None, add_noise = False, noise_threshold = 0.999, normalize = False):
     #Select random image subclass
     #Randomize the size of the image
     if apply_resize:
@@ -53,9 +53,8 @@ def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, fli
         #Apply transformation
         img  = cv2.warpAffine(img ,M,(img.shape[1],img.shape[0]),borderValue = 255)
     #Remove excess rows and columns that appeared after rotation and padding
-    img = img[np.argwhere(np.amin(img,axis=1) < 120)[0][0]:np.argwhere(np.amin(img,axis=1) < 120)[-1][0],:]
-    img = img[:,np.argwhere(np.amin(img,axis=0) < 120)[0][0]:np.argwhere(np.amin(img,axis=0) < 120)[-1][0]]
-    
+    img = img[np.argwhere(np.amin(img,axis=1) < 140)[0][0]:np.argwhere(np.amin(img,axis=1) < 140)[-1][0],:]
+    img = img[:,np.argwhere(np.amin(img,axis=0) < 140)[0][0]:np.argwhere(np.amin(img,axis=0) < 140)[-1][0]]
     img = cv2.resize(img, [100,100]) #Resize back to 100x100
     
     #dilation and erosion
@@ -72,5 +71,10 @@ def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, fli
     #Apply noise by changing random pixels to one.
     if add_noise:
         img[np.random.rand(img.shape[0],img.shape[1]) > noise_threshold] = 0
+    
+    #Changes all the pixels with drawing to one and all the "empty" pixels to 0.
+    if normalize:
+        img[img <= 140] = 1
+        img[img > 140] = 0
     
     return img
