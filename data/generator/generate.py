@@ -6,19 +6,19 @@ import random
 from random import randint
 from scipy import ndimage
 
-#When rotation-, transformation_dir- or thickness_dir = None then rotation, direction in randomly picked
+#When rotation-, transformation_dir- or boldness_dir = None then rotation, direction in randomly picked
 #
 #transformation dir = 0 means the top left corner of the right triangle is shifted.
 #transformation dir = 1 means the top right corner of the right triangle is shifted.
 #transformation dir = 2 means the bottom left corner of the right triangle is shifted.
 #
-#thickness_dir = 1 means dilation
-#thickness_dir = -1 means erosion
+#boldness_dir = 1 means dilation
+#boldness_dir = -1 means erosion
 #
 #add_noise = True means that random pixels on image are changed to black.
 #noise_threshold is value for which the uniform distribution value for pixel must be higher in order it to change black.
 
-def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, apply_transformation = False, transformation_dir = None, apply_thickness = False, thickness_dir = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False):
+def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, excess_str = 140, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, apply_transformation = False, transformation_dir = None, apply_boldness = False, boldness_dir = None, boldness_str = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False):
     #Select random image subclass
     #Randomize the size of the image
     if apply_resize:
@@ -53,20 +53,23 @@ def generate(img, apply_resize = False, resize_str = 20, apply_flip = False, fli
         #Apply transformation
         img  = cv2.warpAffine(img ,M,(img.shape[1],img.shape[0]),borderValue = 255)
     #Remove excess rows and columns that appeared after rotation and padding
-    img = img[np.argwhere(np.amin(img,axis=1) < 140)[0][0]:np.argwhere(np.amin(img,axis=1) < 140)[-1][0],:]
-    img = img[:,np.argwhere(np.amin(img,axis=0) < 140)[0][0]:np.argwhere(np.amin(img,axis=0) < 140)[-1][0]]
+    if remove_excess:
+        img = img[np.argwhere(np.amin(img,axis=1) < excess_str)[0][0]:np.argwhere(np.amin(img,axis=1) < excess_str)[-1][0],:]
+        img = img[:,np.argwhere(np.amin(img,axis=0) < excess_str)[0][0]:np.argwhere(np.amin(img,axis=0) < excess_str)[-1][0]]
     img = cv2.resize(img, [100,100]) #Resize back to 100x100
     
     #dilation and erosion
-    if apply_thickness:
+    if apply_boldness:
     #If randint = 2, then we apply neither.
         kernel = np.ones((3,3),np.uint8) #Kernel 3x3 seemed to work fine.
-        if thickness_dir == None:
-            thickness_dir = randint(-1,1) #If 0 we apply neither.
-        if thickness_dir == 1: #erode 1 iteration. #OpenCV erodes white to black. In our case function erode actually dilates.
-            img = cv2.erode(img,kernel,iterations = 1)
-        if thickness_dir == -1:
-            img = cv2.dilate(img,kernel,iterations = 1)
+        if boldness_dir == None:
+            boldness_dir = randint(-1,1) #If 0 we apply neither.
+        if boldness_str = None:
+            boldness_str = randint(1,4)
+        if boldness_dir == 1: #erode 1 iteration. #OpenCV erodes white to black. In our case function erode actually dilates.
+            img = cv2.erode(img,kernel,iterations = boldness_str)
+        if boldness_dir == -1:
+            img = cv2.dilate(img,kernel,iterations = boldness_str)
     
     #Apply noise by changing random pixels to one.
     if add_noise:
