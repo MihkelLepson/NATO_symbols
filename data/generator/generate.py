@@ -18,7 +18,9 @@ from scipy import ndimage
 #add_noise = True means that random pixels on image are changed to black.
 #noise_threshold is value for which the uniform distribution value for pixel must be higher in order it to change black.
 
-def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, excess_str = 140, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, apply_transformation = False, transformation_dir = None, apply_boldness = False, boldness_dir = None, boldness_str = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False):
+#TODO. Currently for padding, the upper left pixel value is used. See if there is better way.
+
+def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, excess_str = 140, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, padding_val = 255, apply_transformation = False, transformation_dir = None, apply_boldness = False, boldness_dir = None, boldness_str = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False):
     #Select random image subclass
     #Randomize the size of the image
     if apply_resize:
@@ -34,10 +36,10 @@ def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, e
     if apply_rotation:
         if rotation == None:
             rotation = randint(0,359)
-        img = ndimage.rotate(img, randint(0,359), mode='constant',cval=255)
+        img = ndimage.rotate(img, randint(0,359), mode='constant',cval=padding_val)
     if apply_transformation:
         #Add padding for affine transformation. Otherwise the picture might not be in bounds.
-        img = np.pad(img, (100, 100), 'constant', constant_values=(255, 255))
+        img = np.pad(img, (100, 100), 'constant', constant_values=(padding_val, padding_val))
         #Originial right triangle
         pts1 = np.float32([[3,3],[3,10],[10,3]])
         if transformation_dir == None:
@@ -64,7 +66,7 @@ def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, e
         kernel = np.ones((3,3),np.uint8) #Kernel 3x3 seemed to work fine.
         if boldness_dir == None:
             boldness_dir = randint(-1,1) #If 0 we apply neither.
-        if boldness_str = None:
+        if boldness_str == None:
             boldness_str = randint(1,4)
         if boldness_dir == 1: #erode 1 iteration. #OpenCV erodes white to black. In our case function erode actually dilates.
             img = cv2.erode(img,kernel,iterations = boldness_str)
