@@ -36,7 +36,7 @@ def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, e
     if apply_rotation:
         if rotation == None:
             rotation = randint(0,359)
-        img = ndimage.rotate(img, randint(0,359), mode='constant',cval=padding_val)
+        img = ndimage.rotate(img, rotation, mode='constant',cval=padding_val)
     if apply_transformation:
         #Add padding for affine transformation. Otherwise the picture might not be in bounds.
         img = np.pad(img, (100, 100), 'constant', constant_values=(padding_val, padding_val))
