@@ -20,7 +20,7 @@ from scipy import ndimage
 
 #TODO. Currently for padding, the upper left pixel value is used. See if there is better way.
 
-def generate(img, apply_resize = False, resize_str = 20, remove_excess = True, excess_str = 140, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, padding_val = 255, apply_transformation = False, transformation_dir = None, apply_boldness = False, boldness_dir = None, boldness_str = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False, binary_threshold = 140, normalize = False):
+def augment(img, apply_resize = False, resize_str = 20, remove_excess = True, excess_str = 140, apply_flip = False, flip_random = True, apply_rotation = False, rotation = None, padding_val = 255, apply_transformation = False, transformation_dir = None, apply_boldness = False, boldness_dir = None, boldness_str = None, add_noise = False, noise_threshold = 0.999, scale_to_binary = False, binary_threshold = 140, normalize = False):
     #Select random image subclass
     #Randomize the size of the image
     if apply_resize:
