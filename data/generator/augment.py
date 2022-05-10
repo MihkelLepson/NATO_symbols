@@ -60,14 +60,15 @@ def augment(img, apply_resize = False, resize_str = 20, remove_excess = True, ex
         img = img[:,np.argwhere(np.amin(img,axis=0) < excess_str)[0][0]:np.argwhere(np.amin(img,axis=0) < excess_str)[-1][0]]
     img = cv2.resize(img, [100,100]) #Resize back to 100x100
     
+    #Currently with random we do not dialte(that means we do not erode, some symbols disapper with that)
     #dilation and erosion
     if apply_boldness:
     #If randint = 2, then we apply neither.
         kernel = np.ones((3,3),np.uint8) #Kernel 3x3 seemed to work fine.
         if boldness_dir == None:
-            boldness_dir = randint(-1,1) #If 0 we apply neither.
+            boldness_dir = randint(0,1) #If 0 we apply neither.
         if boldness_str == None:
-            boldness_str = randint(1,4)
+            boldness_str = randint(1,2)
         if boldness_dir == 1: #erode 1 iteration. #OpenCV erodes white to black. In our case function erode actually dilates.
             img = cv2.erode(img,kernel,iterations = boldness_str)
         if boldness_dir == -1:
