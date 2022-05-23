@@ -1,0 +1,6 @@
+path: ../datasets/NATO-Symbols
+train: images/train
+val: images/train
+
+nc: 15
+names: ["advance_to_contact", "attack", "block", "counterattack", "cover", "delay", "destroy", "disrupt", "guard", "occupy", "retain", "screen", "secure", "seize", "support_by_fire"]
